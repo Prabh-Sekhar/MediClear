@@ -3,13 +3,12 @@
 
 MediClear is a mobile application designed to simplify complex medical reports into clear, understandable language using responsible AI.
 
-The platform supports **English, Hindi, and Assamese**, improving accessibility for users with varying levels of health literacy.
+The platform supports **English and Assamese**, improving accessibility for users with varying levels of health literacy.
 
 
 # Supported Languages
 
-- English  
-- Hindi  
+- English    
 - Assamese  
 
 
