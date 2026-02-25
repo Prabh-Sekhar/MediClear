@@ -21,7 +21,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0A1628"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.madhurjyadeepch.mediclear"
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -29,6 +30,12 @@
     },
     "plugins": [
       "expo-router"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "e2e7b781-8356-428d-b0c2-c8e0b22e877f"
+      }
+    }
   }
 }
