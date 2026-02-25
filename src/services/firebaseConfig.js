@@ -14,19 +14,34 @@ const firebaseConfig = {
     appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-
-// Initialize Firebase Authentication conditionally based on platform
+// Initialize Firebase with error handling to prevent crashes
+let app;
 let activeAuth;
-if (Platform.OS === 'web') {
-    activeAuth = getAuth(app);
-} else {
-    activeAuth = initializeAuth(app, {
-        persistence: getReactNativePersistence(ReactNativeAsyncStorage)
-    });
-}
-export const auth = activeAuth;
+let db;
 
-// Initialize Cloud Firestore and get a reference to the service
-export const db = getFirestore(app);
+try {
+    app = initializeApp(firebaseConfig);
+
+    // Initialize Firebase Authentication conditionally based on platform
+    if (Platform.OS === 'web') {
+        activeAuth = getAuth(app);
+    } else {
+        try {
+            activeAuth = initializeAuth(app, {
+                persistence: getReactNativePersistence(ReactNativeAsyncStorage)
+            });
+        } catch (authErr) {
+            // initializeAuth may throw if already initialized (hot reload)
+            console.warn('[MediClear] Auth init fallback:', authErr.message);
+            activeAuth = getAuth(app);
+        }
+    }
+
+    // Initialize Cloud Firestore
+    db = getFirestore(app);
+} catch (err) {
+    console.error('[MediClear] Firebase initialization error:', err);
+}
+
+export const auth = activeAuth;
+export { db };
