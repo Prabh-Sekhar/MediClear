@@ -15,16 +15,23 @@ export function AppProvider({ children }) {
     const [reportContext, setReportContext] = useState('');
 
     // Save analysis to Firestore and update local state
-    const saveAndSetAnalysis = useCallback(async (result) => {
+    const saveAndSetAnalysis = useCallback(async (result, assameseResult = null) => {
         setAnalysisResult(result);
         setTranslatedResult(null);
-        setTranslationCache({}); // Clear cache for new analysis
+
+        // Pre-populate cache with Assamese if available
+        if (assameseResult) {
+            setTranslationCache({ as: assameseResult });
+        } else {
+            setTranslationCache({});
+        }
+
         setLanguage('en');
         setChatMessages([]);
         setReportContext(JSON.stringify(result));
 
         // Save to Firestore in background (non-blocking)
-        saveAnalysis(result).catch(err => {
+        saveAnalysis(result, assameseResult).catch(err => {
             console.warn('[MediClear] Background save failed:', err);
         });
     }, []);

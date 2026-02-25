@@ -57,7 +57,7 @@ export default function HomeScreen() {
         try {
             const full = await getAnalysisById(item.id);
             if (full?.full_result) {
-                setAnalysisResult(full.full_result);
+                setAnalysisResult(full.full_result, full.full_result_as || null);
                 setReportContext(JSON.stringify(full.full_result));
                 router.push('/results');
             }

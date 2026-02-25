@@ -2,9 +2,9 @@ import { collection, doc, addDoc, getDoc, getDocs, query, where, orderBy, limit 
 import { db, auth } from './firebaseConfig';
 
 /**
- * Save an analysis result for the current user
+ * Save an analysis result for the current user (English + optional Assamese)
  */
-export async function saveAnalysis(result) {
+export async function saveAnalysis(result, assameseResult = null) {
     try {
         const user = auth.currentUser;
         if (!user) {
@@ -25,6 +25,7 @@ export async function saveAnalysis(result) {
             glossary: result.glossary || [],
             pii_found: result.piiFound || [],
             full_result: result,
+            full_result_as: assameseResult || null,
         };
 
         const docRef = await addDoc(collection(db, 'analyses'), analysisData);

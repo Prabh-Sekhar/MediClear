@@ -28,7 +28,7 @@ async function fileToBase64(uri) {
 
 export default function UploadScreen() {
     const router = useRouter();
-    const { setAnalysisResult, setReportContext, setIsAnalyzing, setTranslationCache } = useApp();
+    const { setAnalysisResult, setReportContext, setIsAnalyzing } = useApp();
     const [selectedFile, setSelectedFile] = useState(null);
     const [loading, setLoading] = useState(false);
     const [backendReady, setBackendReady] = useState(false);
@@ -95,18 +95,23 @@ export default function UploadScreen() {
         try {
             setLoading(true); setIsAnalyzing(true);
             router.push('/analyzing');
-            const result = await analyzeDocument(selectedFile.base64, selectedFile.type);
-            setAnalysisResult(result); setReportContext(JSON.stringify(result));
 
-            // Fire Assamese translation in the background (non-blocking)
-            translateAnalysis(result, 'as')
-                .then(translated => {
-                    console.log('[MediClear] Background Assamese translation complete');
-                    setTranslationCache(prev => ({ ...prev, as: translated }));
-                })
-                .catch(err => {
-                    console.warn('[MediClear] Background translation failed (will retry on demand):', err.message);
-                });
+            // Step 1: Analyze in English
+            const result = await analyzeDocument(selectedFile.base64, selectedFile.type);
+
+            // Step 2: Translate to Assamese
+            let assameseResult = null;
+            try {
+                console.log('[MediClear] Translating to Assamese...');
+                assameseResult = await translateAnalysis(result, 'as');
+                console.log('[MediClear] Assamese translation complete');
+            } catch (transErr) {
+                console.warn('[MediClear] Assamese translation failed, will be available on-demand:', transErr.message);
+            }
+
+            // Step 3: Save both to Firestore + set in state (with cache)
+            setAnalysisResult(result, assameseResult);
+            setReportContext(JSON.stringify(result));
 
             router.replace('/results');
         } catch (error) {
